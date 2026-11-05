@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FITA · Fotografia d'Incidències al Territori Ambiental</title>
+<meta name="description" content="FITA: fes una foto dels fems que trobis i envia-la amb la ubicació. · Report litter with a photo and location.">
+<meta name="theme-color" content="#0e3620">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Brand colours taken from the FITA logo: camera green, leaf, river, alert pin. */
+:root {
+  --bg: #f2f4ef; --surface: #ffffff; --ink: #0e3620; --muted: #5a6b5e; --line: #d8ded3;
+  --accent: #0e3620; --accent-ink: #ffffff; --num: #3c7432;
+  --sun: #3c7432; --sun-ink: #ffffff; --tile: #ffffff; --ok: #3d7a3a; --err: #b0352b;
+  --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #0e1a13; --surface: #15261c; --ink: #e5eee6; --muted: #9db0a1; --line: #24392b;
+  --accent: #8db36f; --accent-ink: #0e1a13; --num: #a9c98d;
+  --sun: #4f8a3f; --sun-ink: #ffffff; --tile: #f2f4ef; --ok: #8fd18a; --err: #ff8b7f; color-scheme: dark } }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); }
+[hidden] { display: none !important }
+img { max-width: 100% }
+.wrap { max-width: 560px; margin: 0 auto; padding-top: max(20px, env(safe-area-inset-top, 0px)); padding-bottom: 130px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 18px; }
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.logo { background: var(--tile); border-radius: 14px; padding: 8px 10px; line-height: 0; }
+.logo img { width: 104px; height: auto; display: block; }
+.langs { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 6px; }
+.langs button { font: 600 13px/1 var(--body); padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line);
+  background: transparent; color: var(--muted); cursor: pointer; }
+.langs button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+h1 { font: 800 clamp(30px, 8vw, 42px)/1.02 var(--display); letter-spacing: -0.02em; margin: 6px 0 0; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 46ch; }
+.stack { display: grid; gap: 18px }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
+.step-h { display: flex; align-items: baseline; gap: 10px; }
+.num { font: 800 13px/1 var(--display); color: var(--num); letter-spacing: .06em; }
+.step-h h2 { font: 600 19px/1.2 var(--display); margin: 0; }
+.opt { font: 400 13px var(--body); color: var(--muted); }
+.photo-btn { display: grid; place-items: center; gap: 6px; min-height: 150px; border-radius: 12px; cursor: pointer;
+  background: var(--sun); color: var(--sun-ink); font: 700 18px var(--body); text-align: center; padding: 16px; }
+.photo-btn svg { width: 40px; height: 40px }
+.photo-btn:focus-within { outline: 3px solid var(--accent); outline-offset: 2px }
+#photo { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.preview { display: grid; gap: 10px }
+.preview img { width: 100%; max-height: 340px; object-fit: cover; border-radius: 10px; background: var(--line) }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); font: 700 15px var(--body); cursor: pointer; text-decoration: underline; justify-self: start }
+.meta { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 15px; margin: 0 }
+.meta dt { color: var(--muted) } .meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overflow-wrap: anywhere }
+.src { color: var(--muted); font-size: 13px }
+label.f { display: grid; gap: 6px; font-weight: 700; font-size: 15px }
+input[type=text], input[type=number], select, textarea {
+  font: 16px var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; width: 100%; }
+textarea { min-height: 70px; resize: vertical }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px }
+.hint { font-size: 13px; color: var(--muted); font-weight: 400; margin: 0 }
+.hint a { color: var(--accent) }
+.row { display: grid; grid-template-columns: 1fr 110px; gap: 10px }
+@media (max-width: 380px) { .row { grid-template-columns: 1fr } }
+.loc { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 15px }
+.loc .ok { color: var(--ok); font-weight: 700; font-variant-numeric: tabular-nums }
+.loc a { color: var(--accent) }
+.locbtn { border: 1px solid var(--accent); color: var(--accent); background: transparent; border-radius: 999px; padding: 9px 14px; font: 700 15px var(--body); cursor: pointer }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden }
+.bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--bg); border-top: 1px solid var(--line);
+  padding-top: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.bar-in { max-width: 560px; margin: 0 auto; display: grid; gap: 6px }
+.send { width: 100%; border: 0; border-radius: 12px; padding: 16px; font: 800 18px var(--display); letter-spacing: .01em;
+  background: var(--accent); color: var(--accent-ink); cursor: pointer }
+.send[disabled] { opacity: .55; cursor: default }
+.msg { font-size: 14px; text-align: center; min-height: 1.2em; color: var(--muted) }
+.msg.err { color: var(--err) }
+.done { text-align: center; display: grid; gap: 12px; justify-items: center; padding: 36px 16px }
+.done h2 { font: 800 30px/1.1 var(--display); margin: 0 }
+.done .tick { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center }
+.again { border: 1px solid var(--ink); background: transparent; color: var(--ink); border-radius: 999px; padding: 12px 22px; font: 700 16px var(--body); cursor: pointer }
+@media (prefers-reduced-motion: no-preference) { .done .tick { animation: pop .35s ease-out } @keyframes pop { from { transform: scale(.6) } } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+  <div class="logo"><img src="logo.png" width="440" height="509" alt="FITA · Fotografia d'Incidències al Territori Ambiental"></div>
+  <nav class="langs" aria-label="Language">
+    <button type="button" data-l="ca">Mallorquí</button>
+    <button type="button" data-l="es">Castellano</button>
+    <button type="button" data-l="de">Deutsch</button>
+    <button type="button" data-l="en">English</button>
+  </nav>
+  </div>
+
+  <form id="form" novalidate class="stack">
+    <header style="display:grid;gap:8px">
+      <h1 data-t="h1"></h1>
+      <p class="lede" data-t="lede"></p>
+    </header>
+
+    <section class="step">
+      <div class="step-h"><span class="num">1</span><h2 data-t="sPhoto"></h2></div>
+      <label class="photo-btn" id="pickBox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h3l2-3h8l2 3h3v11H3z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span data-t="photoBtn"></span>
+        <input id="photo" type="file" accept="image/*" capture="environment">
+      </label>
+      <div class="preview" id="preview" hidden>
+        <img id="previewImg" alt="">
+        <button type="button" class="linkbtn" id="retake" data-t="retake"></button>
+      </div>
+      <dl class="meta" id="meta" hidden>
+        <dt data-t="when"></dt><dd><span id="when"></span> <span class="src" id="whenSrc"></span></dd>
+      </dl>
+    </section>
+
+    <section class="step">
+      <div class="step-h"><span class="num">2</span><h2 data-t="sPlace"></h2></div>
+      <div class="loc" id="loc"></div>
+      <p class="hint" data-t="gpsNone"></p>
+      <label class="f" for="place"><span data-t="placeL"></span>
+        <input id="place" type="text" autocomplete="off">
+      </label>
+    </section>
+
+    <section class="step">
+      <div class="step-h"><span class="num">3</span><h2 data-t="sType"></h2><span class="opt" data-t="optional"></span></div>
+      <div class="row">
+        <label class="f" for="jcode"><span data-t="typeL"></span><select id="jcode"></select></label>
+        <label class="f" for="count"><span data-t="countL"></span><input id="count" type="number" min="1" max="999" value="1" inputmode="numeric"></label>
+      </div>
+      <p class="hint"><span data-t="jHint"></span> <a href="https://mcc.jrc.ec.europa.eu/main/photocatalogue.py" target="_blank" rel="noopener" data-t="jLink"></a></p>
+      <label class="f" for="note"><span data-t="noteL"></span><textarea id="note" maxlength="500"></textarea></label>
+      <div class="hp" aria-hidden="true"><label>Website <input id="website" type="text" tabindex="-1" autocomplete="off"></label></div>
+    </section>
+  </form>
+
+  <section id="done" class="done" hidden>
+    <div class="tick"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h2 data-t="done"></h2>
+    <p class="lede" data-t="doneSub"></p>
+    <button type="button" class="again" id="again" data-t="again"></button>
+  </section>
+</div>
+
+<div class="bar" id="bar">
+  <div class="bar-in">
+    <button type="submit" form="form" class="send" id="send" data-t="send"></button>
+    <div class="msg" id="msg" role="status"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   SETUP: paste your Google Apps Script web app URL here
+   (it ends in /exec). See README.md.
+   ============================================================ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5L4ZKiH-OZv58RbOhE20dUH5ITHfULm5hdkz1xFgN-skN6Bo6SsLFJwwd8x2HqFLjhQ/exec";
+
+// The phone's current location is only used if the photo was taken within this many minutes.
+const MAX_AGE_MIN = 15;
+
+const T = {
+  ca: { h1:"Has vist fems? Fes-li una foto.", lede:"Tres passes: foto, lloc i, si vols, quin tipus de fem és.",
+    sPhoto:"Foto", photoBtn:"Fes o tria una foto", retake:"Canvia la foto", when:"Data i hora", fromPhoto:"(de la foto)", now:"(ara)",
+    sPlace:"Lloc", locating:"Cercant la teva ubicació…", gpsPhoto:"Ubicació de la foto:", gpsLive:"La teva ubicació:", gpsTyped:"Coordenades trobades:",
+    useLoc:"Fes servir la meva ubicació", locFail:"No hem pogut obtenir la ubicació.", map:"mapa",
+    gpsNone:"Si no surt la ubicació, escriu on és o enganxa un enllaç de Google Maps.",
+    placeL:"Descripció del lloc", placePh:"p. ex. Platja de Palma, devora es balneari 6",
+    sType:"Tipus de fem", optional:"opcional", typeL:"Tipus", countL:"Quantes peces?", none:"No ho sé",
+    jHint:"Categories de la llista conjunta de la UE (J-List).", jLink:"Catàleg de fotos", noteL:"Nota (opcional)",
+    send:"Envia", sending:"Enviant…", errPhoto:"Primer fes una foto.", errPlace:"Digues on és, o deixa'ns fer servir la teva ubicació.",
+    errSend:"No s'ha pogut enviar. Comprova la connexió i torna-ho provar.", noSetup:"Aquest formulari encara no està connectat.",
+    done:"Gràcies! S'ha enviat.", doneSub:"Cada avís ajuda a mantenir Mallorca neta.", again:"Envia'n un altre" },
+  es: { h1:"¿Has visto basura? Hazle una foto.", lede:"Tres pasos: foto, lugar y, si quieres, qué tipo de residuo es.",
+    sPhoto:"Foto", photoBtn:"Haz o elige una foto", retake:"Cambiar la foto", when:"Fecha y hora", fromPhoto:"(de la foto)", now:"(ahora)",
+    sPlace:"Lugar", locating:"Buscando tu ubicación…", gpsPhoto:"Ubicación de la foto:", gpsLive:"Tu ubicación:", gpsTyped:"Coordenadas encontradas:",
+    useLoc:"Usar mi ubicación", locFail:"No hemos podido obtener la ubicación.", map:"mapa",
+    gpsNone:"Si no aparece la ubicación, escribe dónde está o pega un enlace de Google Maps.",
+    placeL:"Descripción del lugar", placePh:"p. ej. Playa de Palma, junto al balneario 6",
+    sType:"Tipo de residuo", optional:"opcional", typeL:"Tipo", countL:"¿Cuántas piezas?", none:"No lo sé",
+    jHint:"Categorías de la lista conjunta de la UE (J-List).", jLink:"Catálogo de fotos", noteL:"Nota (opcional)",
+    send:"Enviar", sending:"Enviando…", errPhoto:"Primero haz una foto.", errPlace:"Indica dónde está, o permite usar tu ubicación.",
+    errSend:"No se pudo enviar. Revisa la conexión e inténtalo de nuevo.", noSetup:"Este formulario todavía no está conectado.",
+    done:"¡Gracias! Enviado.", doneSub:"Cada aviso ayuda a mantener Mallorca limpia.", again:"Enviar otro" },
+  de: { h1:"Müll gesehen? Mach ein Foto.", lede:"Drei Schritte: Foto, Ort und, wenn du magst, welche Art Müll.",
+    sPhoto:"Foto", photoBtn:"Foto aufnehmen oder wählen", retake:"Foto ändern", when:"Datum & Uhrzeit", fromPhoto:"(aus dem Foto)", now:"(jetzt)",
+    sPlace:"Ort", locating:"Standort wird gesucht …", gpsPhoto:"Standort aus dem Foto:", gpsLive:"Dein Standort:", gpsTyped:"Koordinaten erkannt:",
+    useLoc:"Meinen Standort verwenden", locFail:"Standort nicht verfügbar.", map:"Karte",
+    gpsNone:"Wenn kein Standort erscheint, schreib, wo es ist, oder füge einen Google-Maps-Link ein.",
+    placeL:"Ortsbeschreibung", placePh:"z. B. Playa de Palma, beim Balneario 6",
+    sType:"Müllart", optional:"optional", typeL:"Art", countL:"Wie viele Stück?", none:"Weiß nicht",
+    jHint:"Kategorien der EU Joint List (J-List).", jLink:"Fotokatalog", noteL:"Notiz (optional)",
+    send:"Senden", sending:"Wird gesendet …", errPhoto:"Bitte zuerst ein Foto machen.", errPlace:"Gib den Ort an oder erlaube den Standort.",
+    errSend:"Senden fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.", noSetup:"Dieses Formular ist noch nicht verbunden.",
+    done:"Danke! Gesendet.", doneSub:"Jede Meldung hilft, Mallorca sauber zu halten.", again:"Noch eine Meldung" },
+  en: { h1:"Spotted litter? Take a photo.", lede:"Three steps: photo, place and, if you like, what kind of litter it is.",
+    sPhoto:"Photo", photoBtn:"Take or choose a photo", retake:"Change photo", when:"Date & time", fromPhoto:"(from the photo)", now:"(now)",
+    sPlace:"Place", locating:"Finding your location…", gpsPhoto:"Location from the photo:", gpsLive:"Your location:", gpsTyped:"Coordinates found:",
+    useLoc:"Use my location", locFail:"Couldn't get your location.", map:"map",
+    gpsNone:"If no location appears, type where it is or paste a Google Maps link.",
+    placeL:"Describe the place", placePh:"e.g. Playa de Palma, by Balneario 6",
+    sType:"Type of litter", optional:"optional", typeL:"Type", countL:"How many pieces?", none:"Not sure",
+    jHint:"Categories from the EU Joint List of litter (J-List).", jLink:"Photo catalogue", noteL:"Note (optional)",
+    send:"Send", sending:"Sending…", errPhoto:"Add a photo first.", errPlace:"Say where it is, or allow your location.",
+    errSend:"Couldn't send. Check your connection and try again.", noSetup:"This form isn't connected yet.",
+    done:"Thanks! Sent.", doneSub:"Every report helps keep Mallorca clean.", again:"Report another" }
+};
+Object.assign(T.ca, { stale:"Aquesta foto és de fa més de 15 minuts i ara pots ser a un altre lloc. Escriu on la vas fer o enganxa un enllaç de Google Maps." });
+Object.assign(T.es, { stale:"Esta foto es de hace más de 15 minutos y ahora puedes estar en otro sitio. Escribe dónde la hiciste o pega un enlace de Google Maps." });
+Object.assign(T.de, { stale:"Dieses Foto ist älter als 15 Minuten, du bist jetzt vielleicht woanders. Schreib, wo du es aufgenommen hast, oder füge einen Google-Maps-Link ein." });
+Object.assign(T.en, { stale:"This photo is more than 15 minutes old, so you may be somewhere else now. Type where you took it or paste a Google Maps link." });
+const MAT = { pl:["Plàstic","Plástico","Kunststoff","Plastic"], me:["Metall","Metal","Metall","Metal"],
+  gc:["Vidre i ceràmica","Vidrio y cerámica","Glas & Keramik","Glass & ceramics"], pp:["Paper i cartó","Papel y cartón","Papier & Pappe","Paper & cardboard"],
+  ru:["Goma","Goma","Gummi","Rubber"], ct:["Roba i tèxtil","Ropa y textil","Kleidung & Textilien","Clothing & textiles"],
+  wo:["Fusta","Madera","Holz","Wood"], fw:["Restes orgàniques","Restos orgánicos","Organische Reste","Organic waste"] };
+// EU Joint List of Litter Categories (Fleet et al., JRC 2021): common items
+const J = [
+ ["J27","pl","Burilles (amb filtre)","Colillas (con filtro)","Zigarettenkippen (mit Filter)","Cigarette butts (with filter)"],
+ ["J7","pl","Botella de plàstic ≤ 0,5 l","Botella de plástico ≤ 0,5 l","Plastikflasche ≤ 0,5 l","Plastic drink bottle ≤ 0.5 l"],
+ ["J8","pl","Botella de plàstic > 0,5 l","Botella de plástico > 0,5 l","Plastikflasche > 0,5 l","Plastic drink bottle > 0.5 l"],
+ ["J21","pl","Tap de beguda de plàstic","Tapón de bebida de plástico","Getränkedeckel aus Plastik","Plastic drink cap or lid"],
+ ["J30","pl","Paquet de patates o embolcall de llepolies","Bolsa de patatas o envoltorio de golosinas","Chipstüte oder Süßigkeitenpapier","Crisp packet or sweet wrapper"],
+ ["J3","pl","Bossa de plàstic de comprar","Bolsa de plástico de la compra","Plastiktragetasche","Plastic shopping bag"],
+ ["J4","pl","Bosseta de plàstic","Bolsa de plástico pequeña","Kleiner Plastikbeutel","Small plastic bag"],
+ ["J227","pl","Tassó o tapa de plàstic dur","Vaso o tapa de plástico duro","Becher oder Deckel aus Hartplastik","Hard plastic cup or lid"],
+ ["J226","pl","Tassó de porexpan","Vaso de poliestireno (corcho blanco)","Styroporbecher","Polystyrene foam cup"],
+ ["J231","pl","Canyeta de plàstic","Pajita de plástico","Plastiktrinkhalm","Plastic straw"],
+ ["J228","pl","Coberts de plàstic","Cubiertos de plástico","Plastikbesteck","Plastic cutlery"],
+ ["J95","pl","Bastonet de cotó (plàstic)","Bastoncillo de algodón (plástico)","Wattestäbchen (Plastik)","Cotton bud stick (plastic)"],
+ ["J237","pl","Tovalloleta humida","Toallita húmeda","Feuchttuch","Wet wipe"],
+ ["J253","pl","Mascareta d'un sol ús","Mascarilla desechable","Einwegmaske","Disposable face mask"],
+ ["J79","pl","Tros de plàstic (2,5–50 cm)","Trozo de plástico (2,5–50 cm)","Plastikstück (2,5–50 cm)","Plastic piece (2.5–50 cm)"],
+ ["J82","pl","Tros de porexpan (2,5–50 cm)","Trozo de poliestireno (2,5–50 cm)","Styroporstück (2,5–50 cm)","Polystyrene piece (2.5–50 cm)"],
+ ["J242","pl","Cordill o fil de plàstic (< 1 cm)","Cordel o hilo de plástico (< 1 cm)","Plastikschnur (< 1 cm)","Plastic string or cord (< 1 cm)"],
+ ["J49","pl","Corda de plàstic (> 1 cm)","Cuerda de plástico (> 1 cm)","Plastikseil (> 1 cm)","Plastic rope (> 1 cm)"],
+ ["J59","pl","Fil de pescar","Sedal de pesca","Angelschnur","Fishing line"],
+ ["J53","pl","Tros de xarxa (2,5–50 cm)","Trozo de red (2,5–50 cm)","Netzstück (2,5–50 cm)","Piece of net (2.5–50 cm)"],
+ ["J241","pl","Altre objecte de plàstic","Otro objeto de plástico","Anderer Plastikgegenstand","Other plastic item"],
+ ["J175","me","Llauna de beguda","Lata de bebida","Getränkedose","Drink can"],
+ ["J178","me","Tap metàl·lic o anella de llauna","Chapa, tapa o anilla de lata","Kronkorken, Deckel oder Dosenlasche","Metal cap, lid or can pull-tab"],
+ ["J198","me","Altre tros de metall (2,5–50 cm)","Otro trozo de metal (2,5–50 cm)","Anderes Metallstück (2,5–50 cm)","Other metal piece (2.5–50 cm)"],
+ ["J200","gc","Botella de vidre","Botella de vidrio","Glasflasche","Glass bottle"],
+ ["J208","gc","Tros de vidre o ceràmica (≥ 2,5 cm)","Trozo de vidrio o cerámica (≥ 2,5 cm)","Glas- oder Keramikscherbe (≥ 2,5 cm)","Glass or ceramic fragment (≥ 2.5 cm)"],
+ ["J148","pp","Capsa de cartó","Caja de cartón","Kartonschachtel","Cardboard box"],
+ ["J156","pp","Tros de paper","Trozo de papel","Papierstück","Piece of paper"],
+ ["J125","ru","Globus de goma","Globo de goma","Luftballon","Rubber balloon"],
+ ["J134","ru","Altre tros de goma","Otro trozo de goma","Anderes Gummistück","Other rubber piece"],
+ ["J137","ct","Roba","Ropa","Kleidung","Clothing"],
+ ["J145","ct","Altres tèxtils","Otros textiles","Andere Textilien","Other textiles"],
+ ["J171","wo","Objecte de fusta treballada (2,5–50 cm)","Objeto de madera trabajada (2,5–50 cm)","Bearbeiteter Holzgegenstand (2,5–50 cm)","Processed wood item (2.5–50 cm)"],
+ ["J215","fw","Restes de menjar","Restos de comida","Essensreste","Food waste"]
+];
+const LI = { ca:0, es:1, de:2, en:3 }, LOC = { ca:"ca-ES", es:"es-ES", de:"de-DE", en:"en-GB" };
+const $ = id => document.getElementById(id);
+
+let lang = (() => {
+  const q = new URLSearchParams(location.search).get("lang"); if (q && T[q]) return q;
+  try { const s = localStorage.getItem("fems-lang"); if (s && T[s]) return s; } catch (e) {}
+  const n = (navigator.language || "ca").slice(0,2).toLowerCase(); return T[n] ? n : "ca"; })();
+const blank = () => ({ file:null, blob:null, takenAt:null, timeSrc:null,
+  photoGps:null, liveGps:null, typedGps:null, locating:false, locFailed:false, stale:false });
+let st = blank();
+
+const t = k => T[lang][k] || T.en[k] || "";
+const fmt = d => { try { return new Date(d).toLocaleString(LOC[lang], { dateStyle:"medium", timeStyle:"short" }); } catch (e) { return String(d); } };
+const osm = (la, lo) => "https://www.openstreetmap.org/?mlat=" + la + "&mlon=" + lo + "#map=18/" + la + "/" + lo;
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach(el => el.textContent = t(el.dataset.t));
+  document.querySelectorAll(".langs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.l === lang));
+  $("place").placeholder = t("placePh");
+  const sel = $("jcode"), cur = sel.value;
+  sel.innerHTML = ""; sel.add(new Option(t("none"), ""));
+  Object.keys(MAT).forEach(m => {
+    const g = document.createElement("optgroup"); g.label = MAT[m][LI[lang]];
+    J.filter(r => r[1] === m).forEach(r => g.appendChild(new Option(r[2 + LI[lang]] + "  · " + r[0], r[0])));
+    sel.appendChild(g);
+  });
+  sel.value = cur;
+  renderMeta(); renderLoc();
+}
+document.querySelectorAll(".langs button").forEach(b => b.addEventListener("click", () => {
+  lang = b.dataset.l; try { localStorage.setItem("fems-lang", lang); } catch (e) {} applyLang(); }));
+
+/* ---------- EXIF: date + GPS from the photo ---------- */
+function readExif(buf) {
+  const v = new DataView(buf);
+  if (v.getUint16(0) !== 0xFFD8) return null;
+  let off = 2;
+  while (off < v.byteLength - 4) {
+    const mk = v.getUint16(off); if ((mk & 0xFF00) !== 0xFF00) break;
+    const len = v.getUint16(off + 2);
+    if (mk === 0xFFE1 && v.getUint32(off + 4) === 0x45786966) return readTiff(v, off + 10);
+    off += 2 + len;
+  }
+  return null;
+}
+function readTiff(v, t0) {
+  const le = v.getUint16(t0) === 0x4949;
+  const g16 = o => v.getUint16(o, le), g32 = o => v.getUint32(o, le);
+  const SZ = {1:1,2:1,3:2,4:4,5:8,7:1,9:4,10:8};
+  const ifd = dir => { const out = {}; const n = g16(dir);
+    for (let i = 0; i < n; i++) { const e = dir + 2 + i*12, type = g16(e+2), cnt = g32(e+4);
+      const p = (SZ[type]||1) * cnt <= 4 ? e + 8 : t0 + g32(e + 8); out[g16(e)] = { type, cnt, p }; } return out; };
+  const val = en => { if (!en) return null; const { type, cnt, p } = en;
+    if (type === 2) { let s = ""; for (let i = 0; i < cnt - 1; i++) s += String.fromCharCode(v.getUint8(p+i)); return s; }
+    if (type === 5) { const a = []; for (let i = 0; i < cnt; i++) a.push(g32(p+i*8) / (g32(p+i*8+4) || 1)); return a; }
+    if (type === 3) return g16(p); if (type === 4) return g32(p); return null; };
+  const i0 = ifd(t0 + g32(t0 + 4)), res = {};
+  try { const ex = i0[0x8769] && ifd(t0 + val(i0[0x8769]));
+    const dt = val(ex && ex[0x9003]) || val(i0[0x0132]);
+    const m = dt && dt.match(/(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+    if (m) res.date = new Date(+m[1], m[2]-1, +m[3], +m[4], +m[5], +m[6]); } catch (e) {}
+  try { const gp = i0[0x8825] && ifd(t0 + val(i0[0x8825]));
+    if (gp && gp[2] && gp[4]) { const la = val(gp[2]), lo = val(gp[4]);
+      let lat = la[0] + la[1]/60 + la[2]/3600, lon = lo[0] + lo[1]/60 + lo[2]/3600;
+      if (val(gp[1]) === "S") lat = -lat; if (val(gp[3]) === "W") lon = -lon;
+      if (isFinite(lat) && isFinite(lon) && (lat || lon)) res.gps = { lat:+lat.toFixed(6), lon:+lon.toFixed(6), acc:null }; } } catch (e) {}
+  return res;
+}
+
+async function shrink(file) {
+  let src;
+  try { src = await createImageBitmap(file, { imageOrientation: "from-image" }); }
+  catch (e) { src = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = URL.createObjectURL(file); }); }
+  const k = Math.min(1, 1600 / Math.max(src.width, src.height));
+  const c = document.createElement("canvas"); c.width = Math.round(src.width*k); c.height = Math.round(src.height*k);
+  c.getContext("2d").drawImage(src, 0, 0, c.width, c.height);
+  return await new Promise(r => c.toBlob(r, "image/jpeg", 0.8));
+}
+const toB64 = blob => new Promise((ok, no) => { const r = new FileReader();
+  r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = no; r.readAsDataURL(blob); });
+
+/* ---------- live location ---------- */
+function locate() {
+  if (!("geolocation" in navigator)) { st.locFailed = true; return renderLoc(); }
+  st.locating = true; st.locFailed = false; renderLoc();
+  navigator.geolocation.getCurrentPosition(p => {
+    st.locating = false;
+    st.liveGps = { lat:+p.coords.latitude.toFixed(6), lon:+p.coords.longitude.toFixed(6), acc:Math.round(p.coords.accuracy) };
+    renderLoc();
+  }, () => { st.locating = false; st.locFailed = true; renderLoc(); },
+  { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+}
+function currentGps() {
+  if (st.photoGps) return { ...st.photoGps, src:"photo" };
+  if (st.typedGps) return { ...st.typedGps, src:"typed" };
+  // The phone's position only counts if the photo is recent; otherwise the person has probably moved.
+  if (st.liveGps && !st.stale) return { ...st.liveGps, src:"device" };
+  return null;
+}
+function renderLoc() {
+  const box = $("loc"); box.innerHTML = "";
+  const g = currentGps();
+  if (!g && st.stale) {
+    const s = document.createElement("span"); s.className = "src"; s.style.color = "var(--ink)"; s.textContent = t("stale"); box.append(s);
+  } else if (g) {
+    const s = document.createElement("span"); s.className = "ok";
+    s.textContent = t(g.src === "photo" ? "gpsPhoto" : g.src === "device" ? "gpsLive" : "gpsTyped") + " " + g.lat.toFixed(5) + ", " + g.lon.toFixed(5) + (g.acc ? " (±" + g.acc + " m)" : "");
+    const a = document.createElement("a"); a.href = osm(g.lat, g.lon); a.target = "_blank"; a.rel = "noopener"; a.textContent = t("map");
+    box.append(s, a);
+  } else if (st.locating) {
+    const s = document.createElement("span"); s.className = "src"; s.textContent = t("locating"); box.append(s);
+  } else {
+    if (st.locFailed) { const s = document.createElement("span"); s.className = "src"; s.textContent = t("locFail"); box.append(s); }
+    const b = document.createElement("button"); b.type = "button"; b.className = "locbtn"; b.textContent = t("useLoc");
+    b.addEventListener("click", locate); box.append(b);
+  }
+}
+function parsePlace() {
+  const m = $("place").value.match(/(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})/);
+  st.typedGps = (m && Math.abs(+m[1]) <= 90 && Math.abs(+m[2]) <= 180) ? { lat:+(+m[1]).toFixed(6), lon:+(+m[2]).toFixed(6), acc:null } : null;
+  renderLoc();
+}
+$("place").addEventListener("input", parsePlace);
+
+/* ---------- photo ---------- */
+$("photo").addEventListener("change", async e => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  st.file = f; st.blob = null; st.photoGps = null; setMsg("");
+  $("previewImg").src = URL.createObjectURL(f);
+  $("preview").hidden = false; $("pickBox").hidden = true;
+  let ex = null; try { ex = readExif(await f.slice(0, 262144).arrayBuffer()); } catch (err) {}
+  const now = Date.now();
+  if (ex && ex.date && !isNaN(ex.date)) { st.takenAt = ex.date; st.timeSrc = "photo"; }
+  else if (f.lastModified && now - f.lastModified > MAX_AGE_MIN * 60000) { st.takenAt = new Date(f.lastModified); st.timeSrc = "photo"; }
+  else { st.takenAt = new Date(); st.timeSrc = "now"; }
+  st.stale = now - st.takenAt.getTime() > MAX_AGE_MIN * 60000;
+  if (ex && ex.gps) st.photoGps = ex.gps;
+  else if (!st.stale && !st.liveGps && !st.locating) locate();
+  renderMeta(); renderLoc();
+  try { st.blob = await shrink(f); } catch (err) { st.blob = f; }
+});
+$("retake").addEventListener("click", () => { $("photo").value = ""; $("photo").click(); });
+
+function renderMeta() {
+  if (!st.takenAt) { $("meta").hidden = true; return; }
+  $("meta").hidden = false; $("when").textContent = fmt(st.takenAt);
+  $("whenSrc").textContent = st.timeSrc === "photo" ? t("fromPhoto") : t("now");
+}
+function setMsg(s, err) { $("msg").textContent = s; $("msg").className = "msg" + (err ? " err" : ""); }
+
+/* ---------- send ---------- */
+$("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!/^https:\/\/script\.google\.com\//.test(SCRIPT_URL)) return setMsg(t("noSetup"), true);
+  if (!st.file) return setMsg(t("errPhoto"), true);
+  const place = $("place").value.trim(), g = currentGps();
+  if (!g && !place) { $("place").focus(); return setMsg(t("errPlace"), true); }
+  const btn = $("send"); btn.disabled = true; btn.textContent = t("sending"); setMsg("");
+  try {
+    const blob = st.blob || await shrink(st.file).catch(() => st.file);
+    const code = $("jcode").value, row = J.find(r => r[0] === code);
+    const payload = {
+      photo: await toB64(blob),
+      takenAt: new Date(st.takenAt).toISOString(), timeSource: st.timeSrc,
+      lat: g ? g.lat : null, lon: g ? g.lon : null, accuracy: g ? g.acc : null, locSource: g ? g.src : null,
+      place, jcode: code || "", item: row ? row[5] : "",
+      count: Math.max(1, parseInt($("count").value, 10) || 1),
+      note: $("note").value.trim(), lang, website: $("website").value
+    };
+    const res = await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+    const out = await res.json().catch(() => ({}));
+    if (!res.ok || !out.ok) throw new Error(out.error || "send");
+    $("form").hidden = true; $("bar").hidden = true; $("done").hidden = false; window.scrollTo(0, 0);
+  } catch (err) {
+    setMsg(t("errSend"), true);
+  } finally { btn.disabled = false; btn.textContent = t("send"); }
+});
+
+$("again").addEventListener("click", () => {
+  st = blank();
+  ["photo","place","note"].forEach(id => $(id).value = ""); $("jcode").value = ""; $("count").value = 1;
+  $("preview").hidden = true; $("pickBox").hidden = false; $("done").hidden = true; $("form").hidden = false; $("bar").hidden = false;
+  setMsg(""); renderMeta(); renderLoc();
+});
+
+applyLang();
+</script>
+</body>
+</html>
