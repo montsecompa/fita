@@ -70,6 +70,9 @@ input:focus, select:focus, textarea:focus, button:focus-visible { outline: 3px s
 .loc { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 15px }
 .loc .ok { color: var(--ok); font-weight: 700; font-variant-numeric: tabular-nums }
 .loc a { color: var(--accent) }
+.lochelp { flex-basis: 100%; font-size: 14px; color: var(--muted) }
+.lochelp summary { cursor: pointer; color: var(--accent); font-weight: 700; width: fit-content }
+.lochelp ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px }
 .locbtn { border: 1px solid var(--accent); color: var(--accent); background: transparent; border-radius: 999px; padding: 9px 14px; font: 700 15px var(--body); cursor: pointer }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden }
 .bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--bg); border-top: 1px solid var(--line);
@@ -214,10 +217,10 @@ const T = {
     errSend:"Couldn't send. Check your connection and try again.", noSetup:"This form isn't connected yet.",
     done:"Thanks! Sent.", doneSub:"Every report helps keep Mallorca clean.", again:"Report another" }
 };
-Object.assign(T.ca, { locDenied:"El navegador no deixa veure la ubicació. Activa-la a la configuració del mòbil (Ubicació → el teu navegador) i torna-ho provar, o escriu el lloc a sota.", stale:"Aquesta foto és de fa més de 15 minuts i ara pots ser a un altre lloc. Escriu on la vas fer o enganxa un enllaç de Google Maps." });
-Object.assign(T.es, { locDenied:"El navegador no permite ver la ubicación. Actívala en los ajustes del móvil (Ubicación → tu navegador) y vuelve a intentarlo, o escribe el lugar abajo.", stale:"Esta foto es de hace más de 15 minutos y ahora puedes estar en otro sitio. Escribe dónde la hiciste o pega un enlace de Google Maps." });
-Object.assign(T.de, { locDenied:"Der Browser gibt den Standort nicht frei. Aktiviere ihn in den Handy-Einstellungen (Standort → dein Browser) und versuche es erneut, oder schreib den Ort unten.", stale:"Dieses Foto ist älter als 15 Minuten, du bist jetzt vielleicht woanders. Schreib, wo du es aufgenommen hast, oder füge einen Google-Maps-Link ein." });
-Object.assign(T.en, { locDenied:"Your browser isn\u2019t sharing your location. Turn it on in your phone\u2019s settings (Location → your browser) and try again, or type the place below.", stale:"This photo is more than 15 minutes old, so you may be somewhere else now. Type where you took it or paste a Google Maps link." });
+Object.assign(T.ca, { locDenied:"La ubicació està desactivada per a aquest navegador.", helpT:"Com activar la ubicació", ios:"iPhone: Configuració → Privacitat i seguretat → Localització (activada) → Llocs web del Safari → «Mentre s'utilitza l'app».", android:"Android (Chrome): ⋮ → Configuració → Configuració de llocs web → Ubicació → permet-la.", tip:"Obre l'enllaç a Safari o Chrome, no dins WhatsApp o Instagram. Després torna a carregar la pàgina.", stale:"Aquesta foto és de fa més de 15 minuts i ara pots ser a un altre lloc. Escriu on la vas fer o enganxa un enllaç de Google Maps." });
+Object.assign(T.es, { locDenied:"La ubicación está desactivada para este navegador.", helpT:"Cómo activar la ubicación", ios:"iPhone: Ajustes → Privacidad y seguridad → Localización (activada) → Sitios web de Safari → «Cuando se use la app».", android:"Android (Chrome): ⋮ → Configuración → Configuración de sitios web → Ubicación → permítela.", tip:"Abre el enlace en Safari o Chrome, no dentro de WhatsApp o Instagram. Luego recarga la página.", stale:"Esta foto es de hace más de 15 minutos y ahora puedes estar en otro sitio. Escribe dónde la hiciste o pega un enlace de Google Maps." });
+Object.assign(T.de, { locDenied:"Der Standort ist für diesen Browser deaktiviert.", helpT:"So aktivierst du den Standort", ios:"iPhone: Einstellungen → Datenschutz & Sicherheit → Ortungsdienste (an) → Safari-Websites → „Beim Verwenden der App“.", android:"Android (Chrome): ⋮ → Einstellungen → Website-Einstellungen → Standort → zulassen.", tip:"Öffne den Link in Safari oder Chrome, nicht in WhatsApp oder Instagram. Lade die Seite danach neu.", stale:"Dieses Foto ist älter als 15 Minuten, du bist jetzt vielleicht woanders. Schreib, wo du es aufgenommen hast, oder füge einen Google-Maps-Link ein." });
+Object.assign(T.en, { locDenied:"Location is turned off for this browser.", helpT:"How to turn on location", ios:"iPhone: Settings → Privacy & Security → Location Services (on) → Safari Websites → “While Using the App”.", android:"Android (Chrome): ⋮ → Settings → Site settings → Location → allow it.", tip:"Open the link in Safari or Chrome, not inside WhatsApp or Instagram. Then reload the page.", stale:"This photo is more than 15 minutes old, so you may be somewhere else now. Type where you took it or paste a Google Maps link." });
 const MAT = { pl:["Plàstic","Plástico","Kunststoff","Plastic"], me:["Metall","Metal","Metall","Metal"],
   gc:["Vidre i ceràmica","Vidrio y cerámica","Glas & Keramik","Glass & ceramics"], pp:["Paper i cartó","Papel y cartón","Papier & Pappe","Paper & cardboard"],
   ru:["Goma","Goma","Gummi","Rubber"], ct:["Roba i tèxtil","Ropa y textil","Kleidung & Textilien","Clothing & textiles"],
@@ -377,10 +380,25 @@ function renderLoc() {
   } else if (st.locating) {
     const s = document.createElement("span"); s.className = "src"; s.textContent = t("locating"); box.append(s);
   } else {
-    if (st.locFailed) { const s = document.createElement("span"); s.className = "src"; s.style.color = "var(--err)"; s.textContent = t(st.locFailed === "denied" ? "locDenied" : "locFail"); box.append(s); }
+    if (st.locFailed) {
+      const s = document.createElement("span"); s.className = "src"; s.style.color = "var(--err)";
+      s.textContent = t(st.locFailed === "denied" ? "locDenied" : "locFail") + " *"; box.append(s);
+    }
     const b = document.createElement("button"); b.type = "button"; b.className = "locbtn"; b.textContent = t("useLoc");
     b.addEventListener("click", locate); box.append(b);
+    if (st.locFailed) box.append(locHelp());
   }
+}
+function locHelp() {
+  const ua = navigator.userAgent || "";
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const android = /Android/.test(ua);
+  const d = document.createElement("details"); d.className = "lochelp";
+  const sm = document.createElement("summary"); sm.textContent = "* " + t("helpT"); d.append(sm);
+  const ul = document.createElement("ul");
+  const keys = ios ? ["ios","tip"] : android ? ["android","tip"] : ["ios","android","tip"];
+  keys.forEach(k => { const li = document.createElement("li"); li.textContent = t(k); ul.append(li); });
+  d.append(ul); return d;
 }
 function parsePlace() {
   const m = $("place").value.match(/(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})/);
