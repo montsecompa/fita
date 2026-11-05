@@ -172,7 +172,7 @@ const T = {
   ca: { h1:"Has vist fems? Fes-li una foto.", lede:"Tres passes: foto, lloc i, si vols, quin tipus de fem és.",
     sPhoto:"Foto", photoBtn:"Fes o tria una foto", retake:"Canvia la foto", when:"Data i hora", fromPhoto:"(de la foto)", now:"(ara)",
     sPlace:"Lloc", locating:"Cercant la teva ubicació…", gpsPhoto:"Ubicació de la foto:", gpsLive:"La teva ubicació:", gpsTyped:"Coordenades trobades:",
-    useLoc:"Fes servir la meva ubicació", locFail:"No hem pogut obtenir la ubicació.", map:"mapa",
+    useLoc:"Fes servir la meva ubicació", locFail:"No hem pogut obtenir la ubicació. Torna-ho provar o escriu el lloc.", map:"mapa",
     gpsNone:"Si no surt la ubicació, escriu on és o enganxa un enllaç de Google Maps.",
     placeL:"Descripció del lloc", placePh:"p. ex. Platja de Palma, devora es balneari 6",
     sType:"Tipus de fem", optional:"opcional", typeL:"Tipus", countL:"Quantes peces?", none:"No ho sé",
@@ -183,7 +183,7 @@ const T = {
   es: { h1:"¿Has visto basura? Hazle una foto.", lede:"Tres pasos: foto, lugar y, si quieres, qué tipo de residuo es.",
     sPhoto:"Foto", photoBtn:"Haz o elige una foto", retake:"Cambiar la foto", when:"Fecha y hora", fromPhoto:"(de la foto)", now:"(ahora)",
     sPlace:"Lugar", locating:"Buscando tu ubicación…", gpsPhoto:"Ubicación de la foto:", gpsLive:"Tu ubicación:", gpsTyped:"Coordenadas encontradas:",
-    useLoc:"Usar mi ubicación", locFail:"No hemos podido obtener la ubicación.", map:"mapa",
+    useLoc:"Usar mi ubicación", locFail:"No hemos podido obtener la ubicación. Vuelve a intentarlo o escribe el lugar.", map:"mapa",
     gpsNone:"Si no aparece la ubicación, escribe dónde está o pega un enlace de Google Maps.",
     placeL:"Descripción del lugar", placePh:"p. ej. Playa de Palma, junto al balneario 6",
     sType:"Tipo de residuo", optional:"opcional", typeL:"Tipo", countL:"¿Cuántas piezas?", none:"No lo sé",
@@ -194,7 +194,7 @@ const T = {
   de: { h1:"Müll gesehen? Mach ein Foto.", lede:"Drei Schritte: Foto, Ort und, wenn du magst, welche Art Müll.",
     sPhoto:"Foto", photoBtn:"Foto aufnehmen oder wählen", retake:"Foto ändern", when:"Datum & Uhrzeit", fromPhoto:"(aus dem Foto)", now:"(jetzt)",
     sPlace:"Ort", locating:"Standort wird gesucht …", gpsPhoto:"Standort aus dem Foto:", gpsLive:"Dein Standort:", gpsTyped:"Koordinaten erkannt:",
-    useLoc:"Meinen Standort verwenden", locFail:"Standort nicht verfügbar.", map:"Karte",
+    useLoc:"Meinen Standort verwenden", locFail:"Standort nicht verfügbar. Versuche es erneut oder schreib den Ort.", map:"Karte",
     gpsNone:"Wenn kein Standort erscheint, schreib, wo es ist, oder füge einen Google-Maps-Link ein.",
     placeL:"Ortsbeschreibung", placePh:"z. B. Playa de Palma, beim Balneario 6",
     sType:"Müllart", optional:"optional", typeL:"Art", countL:"Wie viele Stück?", none:"Weiß nicht",
@@ -205,7 +205,7 @@ const T = {
   en: { h1:"Spotted litter? Take a photo.", lede:"Three steps: photo, place and, if you like, what kind of litter it is.",
     sPhoto:"Photo", photoBtn:"Take or choose a photo", retake:"Change photo", when:"Date & time", fromPhoto:"(from the photo)", now:"(now)",
     sPlace:"Place", locating:"Finding your location…", gpsPhoto:"Location from the photo:", gpsLive:"Your location:", gpsTyped:"Coordinates found:",
-    useLoc:"Use my location", locFail:"Couldn't get your location.", map:"map",
+    useLoc:"Use my location", locFail:"Couldn't get your location. Try again or type the place.", map:"map",
     gpsNone:"If no location appears, type where it is or paste a Google Maps link.",
     placeL:"Describe the place", placePh:"e.g. Playa de Palma, by Balneario 6",
     sType:"Type of litter", optional:"optional", typeL:"Type", countL:"How many pieces?", none:"Not sure",
@@ -214,10 +214,10 @@ const T = {
     errSend:"Couldn't send. Check your connection and try again.", noSetup:"This form isn't connected yet.",
     done:"Thanks! Sent.", doneSub:"Every report helps keep Mallorca clean.", again:"Report another" }
 };
-Object.assign(T.ca, { stale:"Aquesta foto és de fa més de 15 minuts i ara pots ser a un altre lloc. Escriu on la vas fer o enganxa un enllaç de Google Maps." });
-Object.assign(T.es, { stale:"Esta foto es de hace más de 15 minutos y ahora puedes estar en otro sitio. Escribe dónde la hiciste o pega un enlace de Google Maps." });
-Object.assign(T.de, { stale:"Dieses Foto ist älter als 15 Minuten, du bist jetzt vielleicht woanders. Schreib, wo du es aufgenommen hast, oder füge einen Google-Maps-Link ein." });
-Object.assign(T.en, { stale:"This photo is more than 15 minutes old, so you may be somewhere else now. Type where you took it or paste a Google Maps link." });
+Object.assign(T.ca, { locDenied:"El navegador no deixa veure la ubicació. Activa-la a la configuració del mòbil (Ubicació → el teu navegador) i torna-ho provar, o escriu el lloc a sota.", stale:"Aquesta foto és de fa més de 15 minuts i ara pots ser a un altre lloc. Escriu on la vas fer o enganxa un enllaç de Google Maps." });
+Object.assign(T.es, { locDenied:"El navegador no permite ver la ubicación. Actívala en los ajustes del móvil (Ubicación → tu navegador) y vuelve a intentarlo, o escribe el lugar abajo.", stale:"Esta foto es de hace más de 15 minutos y ahora puedes estar en otro sitio. Escribe dónde la hiciste o pega un enlace de Google Maps." });
+Object.assign(T.de, { locDenied:"Der Browser gibt den Standort nicht frei. Aktiviere ihn in den Handy-Einstellungen (Standort → dein Browser) und versuche es erneut, oder schreib den Ort unten.", stale:"Dieses Foto ist älter als 15 Minuten, du bist jetzt vielleicht woanders. Schreib, wo du es aufgenommen hast, oder füge einen Google-Maps-Link ein." });
+Object.assign(T.en, { locDenied:"Your browser isn\u2019t sharing your location. Turn it on in your phone\u2019s settings (Location → your browser) and try again, or type the place below.", stale:"This photo is more than 15 minutes old, so you may be somewhere else now. Type where you took it or paste a Google Maps link." });
 const MAT = { pl:["Plàstic","Plástico","Kunststoff","Plastic"], me:["Metall","Metal","Metall","Metal"],
   gc:["Vidre i ceràmica","Vidrio y cerámica","Glas & Keramik","Glass & ceramics"], pp:["Paper i cartó","Papel y cartón","Papier & Pappe","Paper & cardboard"],
   ru:["Goma","Goma","Gummi","Rubber"], ct:["Roba i tèxtil","Ropa y textil","Kleidung & Textilien","Clothing & textiles"],
@@ -343,14 +343,19 @@ const toB64 = blob => new Promise((ok, no) => { const r = new FileReader();
 
 /* ---------- live location ---------- */
 function locate() {
-  if (!("geolocation" in navigator)) { st.locFailed = true; return renderLoc(); }
+  if (!("geolocation" in navigator)) { st.locFailed = "fail"; return renderLoc(); }
   st.locating = true; st.locFailed = false; renderLoc();
-  navigator.geolocation.getCurrentPosition(p => {
+  const ok = p => {
     st.locating = false;
     st.liveGps = { lat:+p.coords.latitude.toFixed(6), lon:+p.coords.longitude.toFixed(6), acc:Math.round(p.coords.accuracy) };
     renderLoc();
-  }, () => { st.locating = false; st.locFailed = true; renderLoc(); },
-  { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+  };
+  const fail = e => { st.locating = false; st.locFailed = (e && e.code === 1) ? "denied" : "fail"; renderLoc(); };
+  // Try precise GPS first; if it times out or is unavailable (indoors, weak signal), fall back to a rougher fix.
+  navigator.geolocation.getCurrentPosition(ok, e => {
+    if (e && e.code === 1) return fail(e);
+    navigator.geolocation.getCurrentPosition(ok, fail, { enableHighAccuracy: false, timeout: 20000, maximumAge: 300000 });
+  }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
 }
 function currentGps() {
   if (st.photoGps) return { ...st.photoGps, src:"photo" };
@@ -372,7 +377,7 @@ function renderLoc() {
   } else if (st.locating) {
     const s = document.createElement("span"); s.className = "src"; s.textContent = t("locating"); box.append(s);
   } else {
-    if (st.locFailed) { const s = document.createElement("span"); s.className = "src"; s.textContent = t("locFail"); box.append(s); }
+    if (st.locFailed) { const s = document.createElement("span"); s.className = "src"; s.style.color = "var(--err)"; s.textContent = t(st.locFailed === "denied" ? "locDenied" : "locFail"); box.append(s); }
     const b = document.createElement("button"); b.type = "button"; b.className = "locbtn"; b.textContent = t("useLoc");
     b.addEventListener("click", locate); box.append(b);
   }
